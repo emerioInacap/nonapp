@@ -1,6 +1,7 @@
 
 import basedatos
 import hashlib
+import nona
 import vendedores
 import jefeVentas
 import acciones
@@ -21,6 +22,20 @@ class Usuario:
         self.sexo = sexo
         self.password = password
         self.id_cargo = id_cargo
+
+    
+    # Metodo CONSULTAR  /  
+    def consultar(self):
+        bd = basedatos.BaseNona()
+        consulta = 'SELECT max(id_usuario) from usuario'
+        curs = bd.connection.cursor()
+        curs.execute(consulta)
+        total = curs.fetchone()
+        return total[0]
+
+
+        
+        
        
 
     def insertar(self):
@@ -43,15 +58,15 @@ class Usuario:
 
     #validacion
     def validacion(self):
-        nom_usuario = self.nom_usuario
-        password = self.password
 
+        #Validacion de Privilegios
+    
         bd = basedatos.BaseNona()
 
         curs = bd.connection.cursor()
         curs.arraysize=50
     
-        queryValidacion = "SELECT nombre, password, id_cargo from usuario where nombre = '{}' and password = '{}'".format(nom_usuario, password)
+        queryValidacion = "SELECT nombre, password, id_cargo from usuario where nombre = '{}' and password = '{}'".format(self.nom_usuario, self.password)
         curs.execute(queryValidacion)
         queryResultado = curs.fetchone()
         
@@ -59,23 +74,25 @@ class Usuario:
         if queryResultado:
             #self.acceso = True
             print('\nValidacion Correcta\n')
-            print('Bienvenid@', nom_usuario)
+            print('Bienvenid@', self.nom_usuario)
 
             if queryResultado[2] == 1:
-                print('Privilegios de Admin')
+                print('Privilegios de Admin\n')
+                nona.Admin().proximasAcciones()
                 
-                print('1.- Registrar Nuevo Usuario')
-                print('2.- Salir\n')
-                menuPrincipal = input('Ingresa Opcion: ')
 
-                accion = acciones.Acciones()
+            elif queryResultado[2] == 2:
+                print('Privilegios de JefeVentas\n')
 
-
-                if menuPrincipal == '1':
+                jefeVentas.Jefe(self.nom_usuario).proximasAcciones()
+            
+            elif queryResultado[2] == 3:
+                print('Privilegios de Vendedor\n')
                 
-                    accion.registro()
-                else:
-                    print('Sesion Terminada')
+                vendedores.Vendedor(self.nom_usuario).proximasAcciones()
+
+
+                
 
                            
 

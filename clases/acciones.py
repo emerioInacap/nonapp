@@ -1,4 +1,6 @@
 import getpass
+from types import NoneType
+import hashlib
 import usuarios
 import basedatos
 
@@ -17,8 +19,27 @@ class Acciones:
         queryResultado = curs.fetchall()
 
         if queryResultado:
-            print('Ingresar con Perfil de Nona para agregar usuarios')
+
+            print('\n------NONAPP------\n')
+            print('1.- Iniciar Sesion')
+            print('2.- Salir\n')
+            menuPrincipal = input('Ingresa Opcion: ')
+
+
+
+
+            if menuPrincipal == '1':
+            
+                self.login()
+            
+            elif menuPrincipal == '2':
+
+                pass
+            
         else:
+
+            print('\n------Bienvenid@ a NONAPP------')
+            print('\nVamos a Registrar al Usuario Administrador\n')
             self.registro()
 
 
@@ -33,12 +54,18 @@ class Acciones:
         bd = basedatos.BaseNona()
 
         curs = bd.connection.cursor()
+
+        cifrado = hashlib.sha256()
+        cifrado.update(password.encode('utf8'))
     
-        queryValidacion = "SELECT id_usuario, nombre, ap_paterno, ap_materno, rut, fecha_nac, telefono, email, sexo, password, id_cargo from usuario where nombre = '{}' and password = '{}'".format(nom_usuario, password)
+        queryValidacion = "SELECT id_usuario, nombre, ap_paterno, ap_materno, rut, fecha_nac, telefono, email, sexo, password, id_cargo from usuario where nombre = '{}' and password = '{}'".format(nom_usuario, cifrado.hexdigest())
+
         curs.execute(queryValidacion)
         queryResultado = curs.fetchone()
+         
 
         if(queryResultado):
+            
 
             id_usuario = queryResultado[0]
             nom_usuario = queryResultado[1]
@@ -58,6 +85,8 @@ class Acciones:
         else:
             print('error')
 
+      
+
         
             
 
@@ -66,22 +95,46 @@ class Acciones:
 
     def registro(self):
 
+        #Genera ID Usuario
+        
+        usuario = usuarios.Usuario('','','','','','','','','','','')
+        usuariosTabla = usuario.consultar()  #cantidad de usuarios que hay en la tabla
+
+        if(type(usuariosTabla) == NoneType ):
+            id_usuario = 1
+        else:
+            id_usuario = usuariosTabla + 1 #Para generar el id dinamicamente del nuevo usuario
+        
+        
+
         print('\nRegistro de Usuario')
 
+      
+        nombre = input('Ingresar nombre: ')
+        ap_paterno = input('Ingresar apellido paterno: ')
+        ap_materno = input('Ingresar apellido Materno: ')
+        rut = input('Ingresar rut: ')
+        fecha_nac = input('Ingresar fecha de nacimiento dd-mm-aa : ')
+        telefono = input('Ingresar telefono: ')
+        email = input('Ingresar email: ')
         
-        id_usuario = input('Ingresa id usuario: ')
-        nombre = input('Ingresa tu nombre: ')
-        ap_paterno = input('Ingresa tu apellido paterno: ')
-        ap_materno = input('Ingresa tu apellido Materno: ')
-        rut = input('Ingresa rut: ')
-        fecha_nac = input('Ingresa tu fecha de nacimiento dd-mm-aaaa : ')
-        telefono = input('Ingresa tu telefono ')
-        email = input('Ingresa tu email: ')
-        
-        sexo = input("Ingresa tu sexo ('M' o 'F'): ")
-        password = getpass.getpass('Ingresa tu password: ')
+        sexo = input("Ingresar sexo ('M' o 'F'): ")
+        password = getpass.getpass('Ingresar password: ')
 
-        id_cargo = input('Ingresa id cargo: ')
+        nombre_cargo = input('Ingresar nombre del cargo: ')
+
+        if(nombre_cargo).lower() == 'admin':
+            id_cargo = 1
+
+        elif(nombre_cargo).lower() == 'jefe':
+         
+            id_cargo = 2
+        elif(nombre_cargo).lower() == 'vendedor':
+        
+            id_cargo = 3
+        else:
+            print('Error')
+
 
         
         #instancia Usuario

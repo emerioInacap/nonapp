@@ -2,11 +2,16 @@
 import usuarios
 
 class Vendedor:
+    
+    def __init__(self, nom_usuario):
+   
+        self.nom_usuario = nom_usuario
 
+    def proximasAcciones(self):
 
-    def proximasAcciones(self,nom_usuario,password):
+        vendedor = self.nom_usuario
 
-        print('Vendedor:',nom_usuario.upper() )
+        print('Vendedor:', vendedor.upper() )
 
 
         print('\n1.- Consultar Producto')
